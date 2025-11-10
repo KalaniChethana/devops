@@ -1,0 +1,60 @@
+.welcome-container {
+  background-image: url("../image/welcomepage.png");
+  background-size: cover;            /* Fill screen */
+  background-position: center;       /* Center image */
+  background-repeat: no-repeat;      /* Avoid tiling */
+  height: 100vh;                     /* Full viewport height */
+  width: 100%;
+  margin: 0;
+  padding: 20px 20px 0 20px;        /* Top padding for content */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;       /* Align content to top */
+  align-items: center;               /* Center horizontally */
+  font-family: Arial, sans-serif;
+}
+
+.welcome-title {
+  
+  font-size: 60px;
+  margin-bottom: 30px;
+  color: #000000;
+  text-shadow: #34495e;
+  font-family: cursive;
+  align-items: center;
+}
+
+.welcome-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  color: #34495e;
+}
+
+.welcome-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.welcome-button {
+  padding: 12px 24px;
+  background-color:rgba(255, 255, 255, 0.1);
+  color: rgb(16, 34, 62);
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  width: 65px  ;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.2s;
+ border: #fffcfc;
+ border-style: solid;
+  cursor: pointer;
+  
+}
+.welcome-button:hover {
+  background-color: #2980b9;
+  color: white;
+  transform: translateY(-2px);
+}

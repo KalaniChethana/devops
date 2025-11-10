@@ -1,0 +1,82 @@
+/* ===== Full-screen background ===== */
+.login-page {
+  background-image: url("../image/2.png"); /* full-screen wallpaper */
+  background-size: cover;          /* cover entire viewport */
+  background-position: center;     /* center image */
+  background-repeat: no-repeat;    /* no tiling */
+  height: 100vh;                   /* full viewport height */
+  width: 100%;
+  display: flex;
+  justify-content: right;      /* move login box to right */
+  align-items: center;             /* vertical center */
+  font-family: Arial, sans-serif;
+  position: relative;
+}
+
+/* ===== Login container ===== */
+.login-container {
+  background: rgba(255, 255, 255, 0.2); /* semi-transparent white box */
+  padding: 10px 40px 40px 40px ;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  max-width: 300px;
+  width: 100%;
+  text-align: center;
+  margin-right: 200px;
+}
+
+/* ===== Login heading ===== */
+.login-container h2 {
+  font-family: cursive;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #333;
+}
+
+/* ===== Login form ===== */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+/* ===== Input fields ===== */
+.login-form input {
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* ===== Login button ===== */
+.login-form button {
+  padding: 12px;
+  background: #0b2231;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-family: cursive;
+}
+
+/* ===== Login button hover ===== */
+.login-form button:hover {
+  background: #217dbb;
+}
+
+/* ===== Responsive adjustments ===== */
+@media (max-width: 768px) {
+  .login-page {
+    justify-content: center;      /* center login box on small screens */
+    padding-right: 0;
+  }
+
+  .login-container {
+    padding: 30px 20px;
+    max-width: 90%;
+  }
+}
