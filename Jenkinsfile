@@ -10,7 +10,8 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git 'https://github.com/KalaniChethana/devops.git'
+                git branch: 'main', url: 'https://github.com/KalaniChethana/devops.git'
+
             }
         }
 
