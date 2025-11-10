@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  frontend:
+    build: ./frontend
+    container_name: frontend_c
+    ports:
+      - '3000:3000'
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    container_name: backend_c
+    ports:
+      - '5000:5000'
+    stdin_open: true
+    tty: true
+    environment:
+      - MONGO_URI=mongodb://root:secret@mongo:27017/neighborhood?authSource=admin
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo_c
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+      - MONGO_INITDB_DATABASE=neighborhood
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
