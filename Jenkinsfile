@@ -11,7 +11,6 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/KalaniChethana/devops.git'
-
             }
         }
 
@@ -42,12 +41,12 @@ pipeline {
                 script {
                     withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}",
                         usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh '''
+                        sh """
                             echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                             docker push ${BACKEND_IMAGE}:latest
                             docker push ${FRONTEND_IMAGE}:latest
                             docker logout
-                        '''
+                        """
                     }
                 }
             }
