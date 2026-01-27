@@ -1,61 +1,58 @@
 pipeline {
-    agent any
+  agent any
 
-    environment {
-        FRONTEND_IMAGE = "kalanichethana/mern-frontend"
-        BACKEND_IMAGE  = "kalanichethana/mern-backend"
-        DOCKER_CREDENTIALS_ID = "dockerhub"
+  environment {
+    DOCKER_CREDENTIALS_ID = "dockerhub"
+    EC2_HOST = "13.205.2.218"
+    EC2_USER = "ubuntu"
+    EC2_SSH_CRED = "ec2-ssh"
+  }
+
+  stages {
+
+    stage('Checkout') {
+      steps {
+        git branch: 'main',
+            url: 'https://github.com/KalaniChethana/devops.git'
+      }
     }
 
-    stages {
-        stage('Checkout Code') {
-            steps {
-                git branch: 'main', url: 'git@github.com:KalaniChethana/devops.git'
-            }
-        }
-
-        stage('Build Backend Image') {
-            steps {
-                script {
-                    sh """
-                        cd backend
-                        docker build -t ${BACKEND_IMAGE}:latest .
-                    """
-                }
-            }
-        }
-
-        stage('Build Frontend Image') {
-            steps {
-                script {
-                    sh """
-                        cd frontend
-                        docker build -t ${FRONTEND_IMAGE}:latest .
-                    """
-                }
-            }
-        }
-
-        stage('Push Images to Docker Hub') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}",
-                        usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                        sh """
-                            echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                            docker push ${BACKEND_IMAGE}:latest
-                            docker push ${FRONTEND_IMAGE}:latest
-                            docker logout
-                        """
-                    }
-                }
-            }
-        }
+    stage('Build') {
+      steps {
+        sh 'chmod +x scripts/build.sh'
+        sh './scripts/build.sh'
+      }
     }
 
-    post {
-        always {
-            echo "✅ Both Docker images built and pushed to Docker Hub successfully."
+    stage('Push') {
+      steps {
+        withCredentials([usernamePassword(
+          credentialsId: DOCKER_CREDENTIALS_ID,
+          usernameVariable: 'DOCKER_USER',
+          passwordVariable: 'DOCKER_PASS'
+        )]) {
+          sh 'chmod +x scripts/push.sh'
+          sh './scripts/push.sh $DOCKER_USER $DOCKER_PASS'
         }
+      }
     }
+
+    stage('Deploy') {
+      steps {
+        sshagent(credentials: [EC2_SSH_CRED]) {
+          sh 'chmod +x scripts/deploy.sh'
+          sh "./scripts/deploy.sh ${EC2_USER} ${EC2_HOST}"
+        }
+      }
+    }
+  }
+
+  post {
+    success {
+      echo "✅ Build, Push, and Deploy completed successfully"
+    }
+    failure {
+      echo "❌ Pipeline failed"
+    }
+  }
 }

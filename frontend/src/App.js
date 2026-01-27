@@ -5,6 +5,7 @@ import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import ClientDashboard from "./pages/ClientDashboard";
 import ProviderDashboard from "./pages/ProviderDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/" element={<WelcomePage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/client-dashboard" element={<ClientDashboard />} />
         <Route path="/provider-dashboard" element={<ProviderDashboard />} />
       </Routes>
