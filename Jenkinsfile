@@ -2,10 +2,18 @@ pipeline {
   agent any
 
   environment {
+    // DockerHub
     DOCKER_CREDENTIALS_ID = "dockerhub"
+
+    // EC2 SSH deploy
     EC2_HOST = "13.205.2.218"
     EC2_USER = "ubuntu"
     EC2_SSH_CRED = "ec2-ssh"
+
+    // AWS (Secret Text credentials)
+    AWS_ACCESS_KEY_ID     = credentials('aws-access-key')
+    AWS_SECRET_ACCESS_KEY = credentials('aws-secret-key')
+    AWS_DEFAULT_REGION    = 'ap-south-1'
   }
 
   stages {
@@ -16,6 +24,38 @@ pipeline {
             url: 'https://github.com/KalaniChethana/devops.git'
       }
     }
+
+    /* =========================
+       TERRAFORM STAGES
+       ========================= */
+
+    stage('Terraform Init') {
+      steps {
+        dir('terraform') {
+          sh 'terraform init'
+        }
+      }
+    }
+
+    stage('Terraform Plan') {
+      steps {
+        dir('terraform') {
+          sh 'terraform plan -out=tfplan'
+        }
+      }
+    }
+
+    stage('Terraform Apply') {
+      steps {
+        dir('terraform') {
+          sh 'terraform apply -auto-approve tfplan'
+        }
+      }
+    }
+
+    /* =========================
+       DOCKER STAGES
+       ========================= */
 
     stage('Build') {
       steps {
@@ -37,6 +77,10 @@ pipeline {
       }
     }
 
+    /* =========================
+       DEPLOY STAGE
+       ========================= */
+
     stage('Deploy') {
       steps {
         sshagent(credentials: [EC2_SSH_CRED]) {
@@ -49,7 +93,7 @@ pipeline {
 
   post {
     success {
-      echo "✅ Build, Push, and Deploy completed successfully"
+      echo "✅ Terraform + Build + Push + Deploy completed successfully"
     }
     failure {
       echo "❌ Pipeline failed"
