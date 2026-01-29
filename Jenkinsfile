@@ -2,17 +2,9 @@ pipeline {
   agent any
 
   environment {
-    // DockerHub
     DOCKER_CREDENTIALS_ID = "dockerhub"
-
-    // EC2 SSH deploy
-    EC2_HOST = "13.205.2.218"
-    EC2_USER = "ubuntu"
-    EC2_SSH_CRED = "ec2-ssh"
-
-    // AWS (Secret Text credentials)
-   
-    AWS_DEFAULT_REGION    = 'ap-south-1'
+    AWS_DEFAULT_REGION    = "ap-south-1"
+    EC2_SSH_CRED          = "ec2-ssh"
   }
 
   stages {
@@ -23,10 +15,6 @@ pipeline {
             url: 'https://github.com/KalaniChethana/devops.git'
       }
     }
-
-    /* =========================
-       TERRAFORM STAGES
-       ========================= */
 
     stage('Terraform Init') {
       steps {
@@ -52,10 +40,6 @@ pipeline {
       }
     }
 
-    /* =========================
-       DOCKER STAGES
-       ========================= */
-
     stage('Build') {
       steps {
         sh 'chmod +x scripts/build.sh'
@@ -76,41 +60,26 @@ pipeline {
       }
     }
 
-    /* =========================
-       DEPLOY STAGE
-       ========================= */
-
-    stage('Deploy') {
+    stage('Ansible Deploy') {
       steps {
         sshagent(credentials: [EC2_SSH_CRED]) {
-          sh 'chmod +x scripts/deploy.sh'
-          sh "./scripts/deploy.sh ${EC2_USER} ${EC2_HOST}"
+          sh '''
+            ansible --version
+            ansible-galaxy collection install community.docker || true
+            ansible-playbook \
+              -i ansible/inventory.ini \
+              ansible/deploy.yml \
+              --private-key /var/lib/jenkins/.ssh/devops-key.pem
+          '''
         }
       }
     }
-  }
 
-   /* ======================
-       ANSIBLE DEPLOY
-       ====================== */
-       
-  stage('Ansible Deploy') {
-  steps {
-    sshagent(credentials: [EC2_SSH_CRED]) {
-      sh '''
-        ansible --version
-        ansible-galaxy collection install community.docker
-        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
-          --private-key /var/lib/jenkins/.ssh/devops-key.pem
-      '''
-    }
   }
-}
-
 
   post {
     success {
-      echo "✅ Terraform + Build + Push + Deploy completed successfully"
+      echo "✅ Terraform + Build + Push + Ansible Deploy completed successfully"
     }
     failure {
       echo "❌ Pipeline failed"
