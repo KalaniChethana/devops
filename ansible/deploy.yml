@@ -1,0 +1,64 @@
+---
+- name: Deploy MERN app using Docker
+  hosts: app
+  become: true
+
+  vars:
+    backend_image: "kalanichethana/mern-backend:latest"
+    frontend_image: "kalanichethana/mern-frontend:latest"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+
+    - name: Enable & start Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Pull backend image
+      community.docker.docker_image:
+        name: "{{ backend_image }}"
+        source: pull
+
+    - name: Pull frontend image
+      community.docker.docker_image:
+        name: "{{ frontend_image }}"
+        source: pull
+
+    - name: Remove old backend container if exists
+      community.docker.docker_container:
+        name: mern-backend
+        state: absent
+      ignore_errors: yes
+
+    - name: Remove old frontend container if exists
+      community.docker.docker_container:
+        name: mern-frontend
+        state: absent
+      ignore_errors: yes
+
+    - name: Run backend container
+      community.docker.docker_container:
+        name: mern-backend
+        image: "{{ backend_image }}"
+        state: started
+        restart_policy: always
+        published_ports:
+          - "5000:5000"
+
+    - name: Run frontend container
+      community.docker.docker_container:
+        name: mern-frontend
+        image: "{{ frontend_image }}"
+        state: started
+        restart_policy: always
+        published_ports:
+          - "3000:3000"

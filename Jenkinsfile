@@ -90,6 +90,24 @@ pipeline {
     }
   }
 
+   /* ======================
+       ANSIBLE DEPLOY
+       ====================== */
+       
+  stage('Ansible Deploy') {
+  steps {
+    sshagent(credentials: [EC2_SSH_CRED]) {
+      sh '''
+        ansible --version
+        ansible-galaxy collection install community.docker
+        ansible-playbook -i ansible/inventory.ini ansible/deploy.yml \
+          --private-key /var/lib/jenkins/.ssh/devops-key.pem
+      '''
+    }
+  }
+}
+
+
   post {
     success {
       echo "✅ Terraform + Build + Push + Deploy completed successfully"
