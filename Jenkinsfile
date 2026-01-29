@@ -3,8 +3,12 @@ pipeline {
 
   environment {
     DOCKER_CREDENTIALS_ID = "dockerhub"
-    AWS_DEFAULT_REGION    = "ap-south-1"
-    EC2_SSH_CRED          = "ec2-ssh"
+
+    AWS_DEFAULT_REGION = "ap-south-1"
+
+    EC2_SSH_CRED = "ec2-ssh"
+    EC2_USER     = "ubuntu"
+    EC2_HOST     = "13.205.2.218"
   }
 
   stages {
@@ -15,6 +19,8 @@ pipeline {
             url: 'https://github.com/KalaniChethana/devops.git'
       }
     }
+
+    /* ---------- TERRAFORM ---------- */
 
     stage('Terraform Init') {
       steps {
@@ -40,6 +46,8 @@ pipeline {
       }
     }
 
+    /* ---------- DOCKER ---------- */
+
     stage('Build') {
       steps {
         sh 'chmod +x scripts/build.sh'
@@ -60,6 +68,8 @@ pipeline {
       }
     }
 
+    /* ---------- ANSIBLE ---------- */
+
     stage('Ansible Deploy') {
       steps {
         sshagent(credentials: [EC2_SSH_CRED]) {
@@ -75,27 +85,26 @@ pipeline {
       }
     }
 
+    /* ---------- KUBERNETES ---------- */
+
     stage('Deploy to Kubernetes') {
-  steps {
-    sshagent(credentials: [EC2_SSH_CRED]) {
-      sh """
-        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << EOF
-          kubectl apply -f ~/devops/k8s/
-          kubectl rollout status deployment/backend
-          kubectl rollout status deployment/frontend
-        EOF
-      """
+      steps {
+        sshagent(credentials: [EC2_SSH_CRED]) {
+          sh """
+            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << EOF
+              kubectl apply -f ~/devops/k8s/
+              kubectl rollout status deployment/backend
+              kubectl rollout status deployment/frontend
+            EOF
+          """
+        }
+      }
     }
   }
-}
-
-
-  }
-  
 
   post {
     success {
-      echo "✅ Terraform + Build + Push + Ansible Deploy completed successfully"
+      echo "✅ Terraform + Docker + Ansible + Kubernetes completed successfully"
     }
     failure {
       echo "❌ Pipeline failed"
