@@ -1,11 +1,12 @@
 ---
 - name: Deploy MERN app using Docker
-  hosts: app
+  hosts: ec2
   become: true
 
   vars:
-    backend_image: "kalanichethana/mern-backend:latest"
-    frontend_image: "kalanichethana/mern-frontend:latest"
+    backend_repo: "kalanichethana/mern-backend"
+    frontend_repo: "kalanichethana/mern-frontend"
+    image_tag: "latest"
 
   tasks:
     - name: Update apt cache
@@ -25,40 +26,42 @@
 
     - name: Pull backend image
       community.docker.docker_image:
-        name: "{{ backend_image }}"
+        name: "{{ backend_repo }}"
+        tag: "{{ image_tag }}"
         source: pull
 
     - name: Pull frontend image
       community.docker.docker_image:
-        name: "{{ frontend_image }}"
+        name: "{{ frontend_repo }}"
+        tag: "{{ image_tag }}"
         source: pull
 
-    - name: Remove old backend container if exists
+    - name: Remove old backend container
       community.docker.docker_container:
-        name: mern-backend
+        name: backend
         state: absent
-      ignore_errors: yes
+        force_kill: true
 
-    - name: Remove old frontend container if exists
+    - name: Remove old frontend container
       community.docker.docker_container:
-        name: mern-frontend
+        name: frontend
         state: absent
-      ignore_errors: yes
+        force_kill: true
 
     - name: Run backend container
       community.docker.docker_container:
-        name: mern-backend
-        image: "{{ backend_image }}"
+        name: backend
+        image: "{{ backend_repo }}:{{ image_tag }}"
         state: started
         restart_policy: always
         published_ports:
-          - "5000:5000"
+          - "4000:4000"
 
     - name: Run frontend container
       community.docker.docker_container:
-        name: mern-frontend
-        image: "{{ frontend_image }}"
+        name: frontend
+        image: "{{ frontend_repo }}:{{ image_tag }}"
         state: started
         restart_policy: always
         published_ports:
-          - "3000:3000"
+          - "3000:80"
