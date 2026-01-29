@@ -76,6 +76,19 @@ pipeline {
     }
 
   }
+  stage('Deploy to Kubernetes') {
+  steps {
+    sshagent(credentials: [EC2_SSH_CRED]) {
+      sh """
+        ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << EOF
+          kubectl apply -f ~/devops/k8s/
+          kubectl rollout status deployment/backend
+          kubectl rollout status deployment/frontend
+        EOF
+      """
+    }
+  }
+}
 
   post {
     success {
