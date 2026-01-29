@@ -75,8 +75,7 @@ pipeline {
       }
     }
 
-  }
-  stage('Deploy to Kubernetes') {
+    stage('Deploy to Kubernetes') {
   steps {
     sshagent(credentials: [EC2_SSH_CRED]) {
       sh """
@@ -89,6 +88,10 @@ pipeline {
     }
   }
 }
+
+
+  }
+  
 
   post {
     success {
