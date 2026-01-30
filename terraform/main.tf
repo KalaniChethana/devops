@@ -4,10 +4,6 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
-    random = {
-      source = "hashicorp/random"
-      version = "~> 3.0"
-    }
   }
 }
 
@@ -15,10 +11,8 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-resource "random_id" "suffix" {
-  byte_length = 4
+# Simple test resource (no cost)
+resource "aws_s3_bucket" "test_bucket" {
+  bucket = "kalani-terraform-test-bucket-12345"
 }
 
-resource "aws_s3_bucket" "test_bucket" {
-  bucket = "kalani-terraform-test-bucket-${random_id.suffix.hex}"
-}

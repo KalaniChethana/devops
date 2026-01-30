@@ -3,7 +3,8 @@ pipeline {
 
   environment {
     DOCKER_CREDENTIALS_ID = "dockerhub"
-    AWS_DEFAULT_REGION    = "ap-south-1"
+
+    AWS_DEFAULT_REGION = "ap-south-1"
 
     EC2_SSH_CRED = "ec2-ssh"
     EC2_USER     = "ubuntu"
@@ -23,49 +24,24 @@ pipeline {
 
     stage('Terraform Init') {
       steps {
-        withCredentials([
-          string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
-          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
-          // If you use STS token:
-          // string(credentialsId: 'aws-session-token', variable: 'AWS_SESSION_TOKEN')
-        ]) {
-          dir('terraform') {
-            sh '''
-              terraform init
-            '''
-          }
+        dir('terraform') {
+          sh 'terraform init'
         }
       }
     }
 
     stage('Terraform Plan') {
       steps {
-        withCredentials([
-          string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
-          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
-        ]) {
-          dir('terraform') {
-            sh '''
-              echo "KEY length: ${#AWS_ACCESS_KEY_ID}"
-              echo "SECRET length: ${#AWS_SECRET_ACCESS_KEY}"
-              terraform plan -out=tfplan
-            '''
-          }
+        dir('terraform') {
+          sh 'terraform plan -out=tfplan'
         }
       }
     }
 
     stage('Terraform Apply') {
       steps {
-        withCredentials([
-          string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
-          string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
-        ]) {
-          dir('terraform') {
-            sh '''
-              terraform apply -auto-approve tfplan
-            '''
-          }
+        dir('terraform') {
+          sh 'terraform apply -auto-approve tfplan'
         }
       }
     }
@@ -100,7 +76,10 @@ pipeline {
           sh '''
             ansible --version
             ansible-galaxy collection install community.docker || true
-            ansible-playbook -i ansible/inventory.ini ansible/deploy.yml
+            ansible-playbook \
+              -i ansible/inventory.ini \
+              ansible/deploy.yml \
+              --private-key /var/lib/jenkins/.ssh/devops-key.pem
           '''
         }
       }
@@ -112,7 +91,7 @@ pipeline {
       steps {
         sshagent(credentials: [EC2_SSH_CRED]) {
           sh """
-            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << 'EOF'
+            ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} << EOF
               kubectl apply -f ~/devops/k8s/
               kubectl rollout status deployment/backend
               kubectl rollout status deployment/frontend
@@ -124,7 +103,11 @@ pipeline {
   }
 
   post {
-    success { echo "✅ Terraform + Docker + Ansible + Kubernetes completed successfully" }
-    failure { echo "❌ Pipeline failed" }
+    success {
+      echo "✅ Terraform + Docker + Ansible + Kubernetes completed successfully"
+    }
+    failure {
+      echo "❌ Pipeline failed"
+    }
   }
 }
