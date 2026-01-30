@@ -13,6 +13,6 @@ provider "aws" {
 
 # Simple test resource (no cost)
 resource "aws_s3_bucket" "test_bucket" {
-  bucket = "kalani-terraform-test-bucket-12345"
+  bucket = "kalani-terraform-test-bucket-12345-jenkins-01"
 }
 
