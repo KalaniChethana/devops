@@ -1,0 +1,59 @@
+# =========================
+# Terraform
+# =========================
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+*.tfvars
+.terraform.lock.hcl
+
+# =========================
+# Jenkins
+# =========================
+jenkins_home/
+*.log
+
+# =========================
+# Docker
+# =========================
+*.tar
+docker-compose.override.yml
+
+# =========================
+# Node / MERN
+# =========================
+node_modules/
+npm-debug.log
+yarn-error.log
+.env
+.env.*
+
+# =========================
+# Ansible
+# =========================
+*.retry
+ansible.cfg
+
+# =========================
+# OS / Editor junk
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# =========================
+# SSH / Keys (CRITICAL)
+# =========================
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+
+# =========================
+# Build artifacts
+# =========================
+dist/
+build/
+coverage/
