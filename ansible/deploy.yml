@@ -9,11 +9,6 @@
     image_tag: "latest"
 
   tasks:
-
-    # ----------------------------
-    # Install Docker
-    # ----------------------------
-
     - name: Update apt cache
       apt:
         update_cache: yes
@@ -29,27 +24,17 @@
         state: started
         enabled: yes
 
-    # ----------------------------
-    # Pull Latest Images
-    # ----------------------------
-
     - name: Pull backend image
       community.docker.docker_image:
         name: "{{ backend_repo }}"
         tag: "{{ image_tag }}"
         source: pull
-        force_source: true
 
     - name: Pull frontend image
       community.docker.docker_image:
         name: "{{ frontend_repo }}"
         tag: "{{ image_tag }}"
         source: pull
-        force_source: true
-
-    # ----------------------------
-    # Remove Old Containers
-    # ----------------------------
 
     - name: Remove old backend container
       community.docker.docker_container:
@@ -63,24 +48,14 @@
         state: absent
         force_kill: true
 
-    # ----------------------------
-    # Run Backend Container
-    # ----------------------------
-
     - name: Run backend container
       community.docker.docker_container:
         name: backend
         image: "{{ backend_repo }}:{{ image_tag }}"
         state: started
         restart_policy: always
-        pull: yes
-        recreate: yes
         published_ports:
           - "4000:4000"
-
-    # ----------------------------
-    # Run Frontend Container
-    # ----------------------------
 
     - name: Run frontend container
       community.docker.docker_container:
@@ -88,7 +63,5 @@
         image: "{{ frontend_repo }}:{{ image_tag }}"
         state: started
         restart_policy: always
-        pull: yes
-        recreate: yes
         published_ports:
           - "3000:80"
