@@ -78,8 +78,7 @@ pipeline {
             ansible-galaxy collection install community.docker || true
             ansible-playbook \
               -i ansible/inventory.ini \
-              ansible/deploy.yml \
-              --private-key /var/lib/jenkins/.ssh/devops-key.pem
+              ansible/deploy.yml
           '''
         }
       }
