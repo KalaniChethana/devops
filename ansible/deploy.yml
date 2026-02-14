@@ -54,7 +54,7 @@
         image: "{{ backend_repo }}:{{ image_tag }}"
         state: started
         restart_policy: always
-        pull: always
+        pull: true
         published_ports:
           - "4000:4000"
 
@@ -64,6 +64,6 @@
         image: "{{ frontend_repo }}:{{ image_tag }}"
         state: started
         restart_policy: always
-        pull: always
+        pull: true
         published_ports:
           - "3000:80"
