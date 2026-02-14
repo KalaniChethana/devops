@@ -79,7 +79,7 @@ pipeline {
             ansible-playbook \
               -i ansible/inventory.ini \
               ansible/deploy.yml \
-              -e ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+              --private-key /var/lib/jenkins/.ssh/devops-key.pem
           '''
         }
       }
