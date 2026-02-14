@@ -66,4 +66,4 @@
         restart_policy: always
         pull: true
         published_ports:
-          - "3000:80"
+          - "3000:3000"
