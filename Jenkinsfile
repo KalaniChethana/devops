@@ -79,7 +79,7 @@ pipeline {
             ansible-playbook \
               -i ansible/inventory.ini \
               ansible/deploy.yml \
-              -e ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+              -e "ansible_ssh_common_args='-o StrictHostKeyChecking=no'"
           '''
         }
       }
