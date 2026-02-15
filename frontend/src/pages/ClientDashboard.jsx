@@ -34,7 +34,7 @@ export default function ClientDashboard() {
   async function fetchServices() {
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:5000/api/services", {
+      const res = await fetch("http://65.1.12.117:5000/api/services", {
         headers: { "Content-Type": "application/json" },
       });
       if (!res.ok) {

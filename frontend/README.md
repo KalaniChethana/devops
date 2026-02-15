@@ -145,7 +145,7 @@ PORT=5000
 
 **Frontend** (.env):
 ```
-REACT_APP_API_URL=http://localhost:5000/api
+REACT_APP_API_URL=http://65.1.12.117:5000/api
 ```
 
 ## API Documentation
