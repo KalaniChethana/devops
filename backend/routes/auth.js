@@ -167,14 +167,26 @@ router.post("/login", async (req, res) => {
 // Create Admin
 router.post("/create-admin", async (req, res) => {
   try {
-    const adminEmail = "admin@neighborhoodservices.com";
-    const adminPassword = "POST http://localhost:YOUR_PORT/api/auth/create-admin";
+    const adminName = "admin";
+    const adminEmail = "admin@gmail.com";
+    const adminPassword = "admin123";
 
-    const existingAdmin = await User.findOne({ email: adminEmail });
+    // Check if admin exists by email or name
+    const existingAdmin = await User.findOne({
+      $or: [
+        { email: adminEmail },
+        { name: { $regex: `^${adminName}$`, $options: "i" } }
+      ]
+    });
+
     if (existingAdmin) {
       return res.status(200).json({ 
         message: "Admin already exists",
-        credentials: { email: adminEmail, password: adminPassword }
+        credentials: { 
+          username: adminName,
+          email: adminEmail, 
+          password: adminPassword 
+        }
       });
     }
 
@@ -182,7 +194,7 @@ router.post("/create-admin", async (req, res) => {
     const hashedPassword = await bcrypt.hash(adminPassword, salt);
 
     const admin = new User({
-      name: "Administrator",
+      name: adminName,
       email: adminEmail,
       password: hashedPassword,
       role: "admin",
@@ -191,13 +203,15 @@ router.post("/create-admin", async (req, res) => {
 
     await admin.save();
 
-    console.log("✅ Admin created");
+    console.log("✅ Admin created with username: admin and password: admin123");
 
     res.status(201).json({
       message: "Admin created successfully",
       credentials: {
+        username: adminName,
         email: adminEmail,
         password: adminPassword,
+        loginWith: "Use username 'admin' or email 'admin@neighborhoodservices.com'"
       },
     });
 
