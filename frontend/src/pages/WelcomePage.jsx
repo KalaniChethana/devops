@@ -35,7 +35,7 @@ export default function WelcomePage() {
         {/* Hero Section */}
         <div className="welcome-header">
           <div className="header-badge">✨ Welcome</div>
-          <h1 className="welcome-title">Neighborhood Service Finder</h1>
+          <h1 className="welcome-title">Nethmi R.M.K.C</h1>
           <p className="welcome-subtitle">
             Connect with trusted local professionals in seconds. Quality service, rated by your neighbors.
           </p>

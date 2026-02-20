@@ -90,7 +90,7 @@ pipeline {
 
   post {
     success {
-      echo "✅ Terraform + Docker + Ansible + Kubernetes completed successfully"
+      echo "✅ Terraform + Docker + Ansible completed successfully"
     }
     failure {
       echo "❌ Pipeline failed"
